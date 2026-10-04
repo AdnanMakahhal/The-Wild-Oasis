@@ -5,11 +5,14 @@ import LoginMessage from "./LoginMessage";
 import ReservationForm from "./ReservationForm";
 
 async function Reservation({ cabin }) {
+  const session = await auth();
+
+  if (!session?.user) return <LoginMessage />;
+
   const [settings, bookedDates] = await Promise.all([
     getSettings(),
     getBookedDatesByCabinId(cabin.id),
   ]);
-  const session = await auth();
 
   return (
     <div className="grid grid-cols-2 border border-primary-800 min-h-[400px]">
@@ -18,11 +21,7 @@ async function Reservation({ cabin }) {
         bookedDates={bookedDates}
         cabin={cabin}
       />
-      {session?.user ? (
-        <ReservationForm cabin={cabin} user={session.user} />
-      ) : (
-        <LoginMessage />
-      )}
+      <ReservationForm cabin={cabin} user={session.user} />
     </div>
   );
 }
