@@ -1,3 +1,5 @@
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants.js";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -13,4 +15,8 @@ const nextConfig = {
   // output: "export",
 };
 
-export default nextConfig;
+export default (phase) => ({
+  ...nextConfig,
+  // Keep development bundles separate from production builds.
+  distDir: phase === PHASE_DEVELOPMENT_SERVER ? ".next-dev" : ".next",
+});
