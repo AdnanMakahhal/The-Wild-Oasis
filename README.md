@@ -36,34 +36,3 @@ Next.js app lets visitors:
 
 **Stack:** Next.js 14 (App Router), React 18, Supabase, Auth.js (NextAuth), Tailwind
 CSS, React Day Picker, and date-fns.
-
-## Run locally
-
-Each app is a separate project with its own dependencies. Run commands from the
-corresponding project directory.
-
-### Dashboard
-
-```bash
-cd The-Wild-Oasis
-npm install
-npm run dev
-```
-
-### Guest website
-
-```bash
-cd The-Wild-Oasis-Website
-npm install
-```
-
-Copy `.env.example` to `.env.local`, fill in the required local Auth.js, Google OAuth,
-and Supabase settings, then start the app:
-
-```bash
-npm run dev
-```
-
-See the [website setup guide](./The-Wild-Oasis-Website/README.md) for details on
-environment variables and Google OAuth callbacks. Never commit `.env.local` or
-server-only Supabase secrets.
