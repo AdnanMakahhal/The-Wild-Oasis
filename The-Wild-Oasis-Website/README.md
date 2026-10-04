@@ -22,6 +22,25 @@ Copy `.env.example` to `.env.local` before running the app. The example contains
 Supabase project URL and publishable key; both are intended for use by the browser
 client. Keep secret keys out of client-side code and source control.
 
+Generate an Auth.js secret with:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+Set `AUTH_SECRET` in `.env.local` to the generated value. This is required to avoid
+the Auth.js `Missing secret` error. `.env.local` is ignored by Git.
+
+For Google sign-in, set `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET` from your Google
+OAuth client. Add `http://localhost:3000/api/auth/callback/google` as an authorized
+redirect URI. Set `AUTH_URL` to your website URL when deploying, and configure the
+matching Google redirect URI. Set all environment variables in your hosting
+provider as well; generate a separate secret for production.
+
+This project lives in the `The-Wild-Oasis-Website` folder of the shared repository.
+Run installation and app commands from that folder. On Vercel, select
+`The-Wild-Oasis-Website` as the project's Root Directory.
+
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
