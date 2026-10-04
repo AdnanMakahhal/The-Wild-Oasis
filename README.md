@@ -1,8 +1,10 @@
 # The Wild Oasis
 
-The Wild Oasis is a cabin hospitality project made up of two connected web apps: a
-guest-facing booking website and an internal hotel management dashboard. Both apps
-use Supabase for their data.
+## About
+
+A collection of my Wild Oasis projects, featuring a guest booking website and hotel
+management dashboard as I continue learning, improving, and building better digital
+experiences.
 
 ## Live apps
 
