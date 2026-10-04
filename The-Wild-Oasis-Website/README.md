@@ -37,6 +37,18 @@ redirect URI. Set `AUTH_URL` to your website URL when deploying, and configure t
 matching Google redirect URI. Set all environment variables in your hosting
 provider as well; generate a separate secret for production.
 
+In Google Cloud, open **Google Auth Platform > Clients** and use a **Web
+application** client. For local development, its origin is
+`http://localhost:3000` and its redirect URI is
+`http://localhost:3000/api/auth/callback/google`. If the app is in Testing mode,
+add your Google account under **Audience > Test users** before signing in.
+
+Set `SUPABASE_SECRET_KEY` in `.env.local` using a Supabase secret key (or a legacy
+`service_role` key). Auth.js sessions are separate from Supabase Auth sessions,
+so the publishable key alone cannot access protected guest and booking tables.
+The secret is used only by server code; never use a `NEXT_PUBLIC_` prefix or commit
+its value. Guest and booking access is restricted to the signed-in guest.
+
 This project lives in the `The-Wild-Oasis-Website` folder of the shared repository.
 Run installation and app commands from that folder. On Vercel, select
 `The-Wild-Oasis-Website` as the project's Root Directory.

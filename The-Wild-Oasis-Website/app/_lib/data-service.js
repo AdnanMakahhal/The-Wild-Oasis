@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import { eachDayOfInterval } from "date-fns";
 import { supabase } from "./supabase";
+import { auth } from "./auth";
+import { findGuestByEmail } from "./guest-service";
+import { getSupabaseServer } from "./supabase-server";
 
 /////////////
 // GET
@@ -56,21 +59,20 @@ export const getCabins = async function () {
 
 // Guests are uniquely identified by their email address
 export async function getGuest(email) {
-  const { data, error } = await supabase
-    .from("guests")
-    .select("*")
-    .eq("email", email)
-    .single();
-
-  // No error here! We handle the possibility of no guest in the sign in callback
-  return data;
+  const session = await auth();
+  if (!session?.user?.guestId || session.user.email !== email)
+    throw new Error("You are not allowed to access this guest");
+  return findGuestByEmail(email);
 }
 
 export async function getBooking(id) {
-  const { data, error, count } = await supabase
+  const session = await auth();
+  if (!session?.user?.guestId) throw new Error("You must be logged in");
+  const { data, error } = await getSupabaseServer()
     .from("bookings")
     .select("*")
     .eq("id", id)
+    .eq("guestId", session.user.guestId)
     .single();
 
   if (error) {
@@ -82,7 +84,10 @@ export async function getBooking(id) {
 }
 
 export async function getBookings(guestId) {
-  const { data, error, count } = await supabase
+  const session = await auth();
+  if (!session?.user?.guestId || session.user.guestId !== guestId)
+    throw new Error("You are not allowed to access these bookings");
+  const { data, error } = await getSupabaseServer()
     .from("bookings")
     // We actually also need data on the cabins as well. But let's ONLY take the data that we actually need, in order to reduce downloaded data.
     .select(
@@ -105,9 +110,9 @@ export async function getBookedDatesByCabinId(cabinId) {
   today = today.toISOString();
 
   // Getting all bookings
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseServer()
     .from("bookings")
-    .select("*")
+    .select("startDate, endDate")
     .eq("cabinId", cabinId)
     .or(`startDate.gte.${today},status.eq.checked-in`);
 
@@ -130,7 +135,7 @@ export async function getBookedDatesByCabinId(cabinId) {
 }
 
 export async function getSettings() {
-  const { data, error } = await supabase.from("settings").select("*").single();
+  const { data, error } = await getSupabaseServer().from("settings").select("*").single();
 
   // await new Promise((res) => setTimeout(res, 5000));
 

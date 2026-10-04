@@ -1,38 +1,21 @@
 import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
-import { createGuest, getGuest } from "./data-service";
+import authConfig from "./auth.config";
+import { ensureGuest } from "./guest-service";
 
-const authConfig = {
-  providers: [
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
-  ],
+const config = {
+  ...authConfig,
   callbacks: {
-    authorized({ auth, request }) {
-      return !!auth?.user;
+    ...authConfig.callbacks,
+    signIn({ account, profile, user }) {
+      return account?.provider === "google" && profile?.email_verified === true && !!user.email;
     },
-    async signIn({ user, account, profile }) {
-      try {
-        const existingGuest = await getGuest(user.email);
-
-        if (!existingGuest)
-          await createGuest({ email: user.email, fullName: user.name });
-
-        return true;
-      } catch {
-        return false;
+    async jwt({ token, user }) {
+      if (user) {
+        const guest = await ensureGuest(user);
+        token.guestId = guest.id;
       }
+      return token;
     },
-    async session({ session, user }) {
-      const guest = await getGuest(session.user.email);
-      session.user.guestId = guest.id;
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/login",
   },
 };
 
@@ -41,4 +24,4 @@ export const {
   signIn,
   signOut,
   handlers: { GET, POST },
-} = NextAuth(authConfig);
+} = NextAuth(config);
